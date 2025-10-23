@@ -191,9 +191,12 @@ if(ENABLE_TINY_DEVICES)
         set(ENABLE_PLUGINS OFF CACHE BOOL "Build with plugins" FORCE)
         set(ENABLE_PLUGIN_IFDEMO OFF CACHE BOOL "Build with plugin interface demo" FORCE)
         set(ENABLE_LUA OFF CACHE BOOL "Build with Lua dissector support" FORCE)
+        # Keep the capture stack available so embedded devices can stream packets
+        # to dumpcap/tshark when libpcap is provided by the toolchain.
+        set(ENABLE_CHECKHF_CONFLICT ON CACHE BOOL "Enable hf conflict check for debugging (start-up may be slower)" FORCE)
         set(ENABLE_SMI OFF CACHE BOOL "Build with libsmi snmp support" FORCE)
         set(ENABLE_GNUTLS OFF CACHE BOOL "Build with RSA decryption support" FORCE)
-        set(ENABLE_ZLIB ON CACHE BOOL "Build with zlib compression support" FORCE)
+        set(ENABLE_ZLIB OFF CACHE BOOL "Build with zlib compression support" FORCE)
         set(ENABLE_ZLIBNG OFF CACHE BOOL "Build with zlib-ng compression support" FORCE)
         set(ENABLE_MINIZIP OFF CACHE BOOL "Build with zip file compression support" FORCE)
         set(ENABLE_MINIZIPNG OFF CACHE BOOL "Build with zip file compression support" FORCE)

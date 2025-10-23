@@ -36,7 +36,10 @@ For resource-constrained environments where only the console analyzers are
 required, enable the `ENABLE_TINY_DEVICES` CMake option. This configures the
 build in "C only" mode, skips the GUI, plugin, documentation, and auxiliary
 toolchain targets, and limits optional dependencies to C-based components so
-the tree is ready for cross-compiling to embedded toolchains.
+the tree is ready for cross-compiling to embedded toolchains. Core packet I/O
+features such as libpcap remain available when the toolchain supplies them, so
+`dumpcap` and `tshark` can still attach to native interfaces or to external
+producers that stream packets in pcap/pcapng form.
 
 ```
 cmake -DENABLE_TINY_DEVICES=ON -DCMAKE_BUILD_TYPE=Release /path/to/wireshark
@@ -44,7 +47,15 @@ cmake -DENABLE_TINY_DEVICES=ON -DCMAKE_BUILD_TYPE=Release /path/to/wireshark
 
 Only the command-line utilities such as `tshark`, `dumpcap`, and related
 capture tools will be generated when this option is active, with no C++ code
-compiled as part of the build graph.
+compiled as part of the build graph. This makes it straightforward to bridge an
+embedded sniffer—such as an ESP32 running in promiscuous mode that serializes
+802.11 frames—to a host running Wireshark tooling. The microcontroller can wrap
+frames in pcap or pcapng records and forward them over UART, USB, or a named
+pipe; on the host `tshark -i -` (or `dumpcap -i -`) can ingest the byte stream
+and feed it through the normal dissectors in real time while still supporting
+offline workflows. See [`doc/tiny-device-pcap.md`](doc/tiny-device-pcap.md) for
+an end-to-end example that includes an ESP32-friendly `pcap` writer helper and
+host-side piping commands.
 
 It should run on other Unix-ish systems without too much trouble.
 
