@@ -1,0 +1,51 @@
+name: Build Windows Tiny Devices
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  windows-tiny:
+    name: Build Tiny Devices
+    runs-on: windows-2022
+    env:
+      PLATFORM: x64
+      WIRESHARK_BASE_DIR: C:\\Development
+      CMAKE_PREFIX_PATH: D:\\a\\wireshark\\Qt\\6.8.3\\msvc2022_64
+      WIRESHARK_VERSION_EXTRA: -GithubActionTinyBuild
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Install dependencies
+        run: choco install -y --force --no-progress asciidoctorj xsltproc docbook-bundle nsis winflexbison3 cmake
+
+      - name: Add msbuild to PATH
+        uses: microsoft/setup-msbuild@v2
+        with:
+          vs-version: 17.13
+
+      - name: Set MSVC command prompt
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Create build directory
+        run: mkdir build
+
+      - name: Configure tiny device build
+        run: cmake -DENABLE_TINY_DEVICES=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_SYSTEM_VERSION="10.0.20348.0" -A x64 ..
+        env:
+          PLATFORM: x64
+          WIRESHARK_BASE_DIR: C:/wireshark-libs
+        working-directory: build
+
+      - name: Build tiny device binaries
+        run: cmake --build . --config Release
+        working-directory: build
