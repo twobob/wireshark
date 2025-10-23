@@ -18,21 +18,28 @@ endif()
 # https://doc.qt.io/qt-6/cmake-supported-cmake-versions.html
 cmake_minimum_required(VERSION 3.20)
 if(POLICY CMP0127)
-	cmake_policy(SET CMP0127 NEW)
+        cmake_policy(SET CMP0127 NEW)
 endif()
 if(POLICY CMP0135)
-	cmake_policy(SET CMP0135 NEW)
+        cmake_policy(SET CMP0135 NEW)
 endif()
+
+include(CMakeOptions.txt)
 
 if(WIN32 AND NOT DEFINED ENV{MSYSTEM})
-	set(_project_name Wireshark)
-	set(STRATOSHARK_NAME Stratoshark)
+        set(_project_name Wireshark)
+        set(STRATOSHARK_NAME Stratoshark)
 else()
-	set(_project_name wireshark)
-	set(STRATOSHARK_NAME stratoshark)
+        set(_project_name wireshark)
+        set(STRATOSHARK_NAME stratoshark)
 endif()
 
-project(${_project_name} C CXX)
+set(_project_languages C)
+if(NOT ENABLE_TINY_DEVICES)
+        list(APPEND _project_languages CXX)
+endif()
+
+project(${_project_name} ${_project_languages})
 
 if(WIN32)
 	set(_msystem False)
@@ -76,20 +83,25 @@ endif()
 
 set(STRATOSHARK_VERSION "${STRATOSHARK_MAJOR_VERSION}.${STRATOSHARK_MINOR_VERSION}.${STRATOSHARK_PATCH_VERSION}${STRATOSHARK_VERSION_EXTENSION}")
 
-include( CMakeOptions.txt )
+if(ENABLE_TINY_DEVICES)
+        message(STATUS "Tiny device mode enabled: restricting build graph to console-oriented C targets.")
+endif()
 
 # We require minimum C11
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)
 
-# We require minimum C++11. libscap and libsinsp require C++ 17.
-if(BUILD_stratoshark OR BUILD_falcodump OR BUILD_dumpcalls)
-	set(CMAKE_CXX_STANDARD 17)
-else()
-	set(CMAKE_CXX_STANDARD 11)
+# We require minimum C++11. libscap and libsinsp require C++ 17. Skip C++ when
+# trimming the build for tiny devices.
+if(NOT ENABLE_TINY_DEVICES)
+        if(BUILD_stratoshark OR BUILD_falcodump OR BUILD_dumpcalls)
+                set(CMAKE_CXX_STANDARD 17)
+        else()
+                set(CMAKE_CXX_STANDARD 11)
+        endif()
+        set(CMAKE_CXX_STANDARD_REQUIRED ON)
+        set(CMAKE_CXX_EXTENSIONS OFF)
 endif()
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
 
 message(STATUS "Generating build using CMake ${CMAKE_VERSION}")
 
@@ -1778,15 +1790,17 @@ set(PLUGIN_VERSION_DIR "plugins/${PLUGIN_PATH_ID}")
 
 add_subdirectory( capture )
 add_subdirectory( epan )
-add_subdirectory( extcap )
-add_subdirectory( randpkt_core )
-if(NOT LEMON_EXECUTABLE)
-	add_subdirectory( tools/lemon )
+if(NOT ENABLE_TINY_DEVICES)
+        add_subdirectory( extcap )
+        add_subdirectory( randpkt_core )
+        if(NOT LEMON_EXECUTABLE)
+                add_subdirectory( tools/lemon )
+        endif()
+        if(PCAP_FOUND)
+                add_subdirectory( tools/radiotap-gen )
+        endif()
+        add_subdirectory( ui )
 endif()
-if(PCAP_FOUND)
-	add_subdirectory( tools/radiotap-gen )
-endif()
-add_subdirectory( ui )
 add_subdirectory( wiretap )
 add_subdirectory( writecap )
 
@@ -1833,8 +1847,11 @@ endif()
 add_subdirectory( wsutil )
 
 # doc/ must be added after DATAFILE_DIR is set so that the guides can be
-# copied there for running from the build directory
-add_subdirectory( doc )
+# copied there for running from the build directory. Skip documentation in
+# tiny device builds to avoid generating non-console artifacts.
+if(NOT ENABLE_TINY_DEVICES)
+        add_subdirectory( doc )
+endif()
 
 if(BUILD_wireshark AND QT_FOUND)
 	add_subdirectory( ui/qt )
