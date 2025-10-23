@@ -78,6 +78,10 @@ set(STRATOSHARK_VERSION "${STRATOSHARK_MAJOR_VERSION}.${STRATOSHARK_MINOR_VERSIO
 
 include( CMakeOptions.txt )
 
+if(ENABLE_TINY_DEVICES)
+        message(STATUS "Tiny device mode enabled: console-only utilities and C dependencies will be built.")
+endif()
+
 # We require minimum C11
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED ON)

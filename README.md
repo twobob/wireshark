@@ -39,6 +39,21 @@ OpenBSD.
 Additionally it is available through many third-party packaging systems
 such as pkgsrc, OpenCSW, Homebrew, and MacPorts.
 
+Console-only builds for tiny devices
+------------------------------------
+
+For resource-constrained environments where only the console analyzers are
+required, enable the `ENABLE_TINY_DEVICES` CMake option. This prunes GUI and
+plugin targets, limits optional dependencies to C-based components, and
+prepares the project for cross-compiling to embedded toolchains.
+
+```
+cmake -DENABLE_TINY_DEVICES=ON -DCMAKE_BUILD_TYPE=Release /path/to/wireshark
+```
+
+Only the command-line utilities such as `tshark`, `dumpcap`, and related
+capture tools will be generated when this option is active.
+
 It should run on other Unix-ish systems without too much trouble.
 
 In some cases the current version of Wireshark might not support your
