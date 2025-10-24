@@ -23,6 +23,27 @@
 
 #cmakedefine MMDBRESOLVE_EXE @MMDBRESOLVE_EXE@
 #cmakedefine BUILD_etwdump
+#cmakedefine BUILD_wireshark
+#cmakedefine BUILD_tshark
+#cmakedefine BUILD_dumpcap
+#cmakedefine BUILD_capinfos
+#cmakedefine BUILD_captype
+#cmakedefine BUILD_editcap
+#cmakedefine BUILD_mergecap
+#cmakedefine BUILD_randpkt
+#cmakedefine BUILD_rawshark
+#cmakedefine BUILD_reordercap
+#cmakedefine BUILD_sharkd
+#cmakedefine BUILD_text2pcap
+#cmakedefine BUILD_androiddump
+#cmakedefine BUILD_ciscodump
+#cmakedefine BUILD_randpktdump
+#cmakedefine BUILD_sshdump
+#cmakedefine BUILD_wifidump
+#cmakedefine BUILD_udpdump
+#cmakedefine HAVE_EXTCAP_TOOLS
+#cmakedefine ENABLE_PLUGINS
+#cmakedefine ENABLE_TINY_DEVICES
 #cmakedefine SPANDSP_FOUND
 #cmakedefine BCG729_FOUND
 #cmakedefine SBC_FOUND

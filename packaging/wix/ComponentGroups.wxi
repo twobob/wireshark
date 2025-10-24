@@ -2,6 +2,7 @@
 <Include>
 
   <!-- Wireshark -->
+  <?if $(var.BUILD_wireshark) ?>
     <Fragment>
       <DirectoryRef Id="INSTALLFOLDER">
         <Component Id="cmpWireshark_exe" Guid="*">
@@ -14,6 +15,7 @@
         <ComponentRef Id="cmpWireshark_exe" />
       </ComponentGroup>
     </Fragment>
+  <?endif?>
 
   <!-- Install for every user -->
     <Fragment>
@@ -48,12 +50,15 @@
         <Component Id="cmpWireshark_filter_html" Guid="*">
           <File Id="filWireshark_filter_html" KeyPath="yes" Source="$(var.Staging.Dir)\wireshark-filter.html" />
         </Component>
+        <?if $(var.BUILD_dumpcap) ?>
         <Component Id="cmpDumpcap_exe" Guid="*">
           <File Id="filDumpcap_exe" KeyPath="yes" Source="$(var.Staging.Dir)\dumpcap.exe" />
         </Component>
         <Component Id="cmpDumpcap_html" Guid="*">
           <File Id="filDumpcap_html" KeyPath="yes" Source="$(var.Staging.Dir)\dumpcap.html" />
         </Component>
+        <?endif?>
+        <?if !$(var.ENABLE_TINY_DEVICES) ?>
         <Component Id="cmpExtcap_html" Guid="*">
           <File Id="filExtcap_html" KeyPath="yes" Source="$(var.Staging.Dir)\extcap.html" />
         </Component>
@@ -63,6 +68,7 @@
         <Component Id="cmpReleaseNotes_html" Guid="*">
           <File Id="filReleaseNotes_html" KeyPath="yes" Source="$(var.Staging.Dir)\Wireshark Release Notes.html" />
         </Component>
+        <?endif?>
       </DirectoryRef>
     </Fragment>
     <Fragment>
@@ -77,11 +83,15 @@
         <ComponentRef Id="cmpWs_css" />
         <ComponentRef Id="cmpWireshark_html" />
         <ComponentRef Id="cmpWireshark_filter_html" />
+        <?if $(var.BUILD_dumpcap) ?>
         <ComponentRef Id="cmpDumpcap_exe" />
         <ComponentRef Id="cmpDumpcap_html" />
+        <?endif?>
+        <?if !$(var.ENABLE_TINY_DEVICES) ?>
         <ComponentRef Id="cmpExtcap_html" />
         <ComponentRef Id="cmpIpmap_html" />
         <ComponentRef Id="cmpReleaseNotes_html" />
+        <?endif?>
       </ComponentGroup>
     </Fragment>
 
@@ -216,22 +226,24 @@
     </Fragment>
 
   <!-- TShark -->
-    <Fragment>
-        <DirectoryRef Id="INSTALLFOLDER">
-            <Component Id="cmpTShark_exe" Guid="*">
-                <File Id="filTShark_exe" KeyPath="yes" Source="$(var.Staging.Dir)\tshark.exe" />
-            </Component>
-            <Component Id="cmpTShark_html" Guid="*">
-                <File Id="filTShark_html" KeyPath="yes" Source="$(var.Staging.Dir)\tshark.html" />
-            </Component>
-        </DirectoryRef>
-    </Fragment>
-    <Fragment>
+  <?if $(var.BUILD_tshark) ?>
+  <Fragment>
+    <DirectoryRef Id="INSTALLFOLDER">
+      <Component Id="cmpTShark_exe" Guid="*">
+        <File Id="filTShark_exe" KeyPath="yes" Source="$(var.Staging.Dir)\tshark.exe" />
+      </Component>
+      <Component Id="cmpTShark_html" Guid="*">
+        <File Id="filTShark_html" KeyPath="yes" Source="$(var.Staging.Dir)\tshark.html" />
+      </Component>
+    </DirectoryRef>
+  </Fragment>
+  <Fragment>
         <ComponentGroup Id="CG.TShark">
             <ComponentRef Id="cmpTShark_exe" />
             <ComponentRef Id="cmpTShark_html" />
         </ComponentGroup>
     </Fragment>
+  <?endif?>
 
   <!-- Configuration Profiles -->
   <Fragment>
@@ -266,6 +278,7 @@
   </Fragment>
 
   <!-- Editcap -->
+  <?if $(var.BUILD_editcap) ?>
   <Fragment>
       <DirectoryRef Id="INSTALLFOLDER">
           <Component Id="cmpEditcap_exe" Guid="*">
@@ -282,8 +295,10 @@
           <ComponentRef Id="cmpEditcap_html" />
       </ComponentGroup>
   </Fragment>
+  <?endif?>
 
   <!-- Text2Pcap -->
+  <?if $(var.BUILD_text2pcap) ?>
   <Fragment>
     <DirectoryRef Id="INSTALLFOLDER">
       <Component Id="cmpText2pcap_exe" Guid="*">
@@ -300,8 +315,10 @@
       <ComponentRef Id="cmpText2pcap_html" />
     </ComponentGroup>
   </Fragment>
+  <?endif?>
 
   <!-- Mergecap -->
+  <?if $(var.BUILD_mergecap) ?>
   <Fragment>
     <DirectoryRef Id="INSTALLFOLDER">
       <Component Id="cmpMergecap_exe" Guid="*">
@@ -318,8 +335,10 @@
       <ComponentRef Id="cmpMergecap_html" />
     </ComponentGroup>
   </Fragment>
+  <?endif?>
 
   <!-- Reordercap -->
+  <?if $(var.BUILD_reordercap) ?>
   <Fragment>
     <DirectoryRef Id="INSTALLFOLDER">
       <Component Id="cmpReordercap_exe" Guid="*">
@@ -336,8 +355,10 @@
       <ComponentRef Id="cmpReordercap_html" />
     </ComponentGroup>
   </Fragment>
+  <?endif?>
 
   <!-- Capinfos -->
+  <?if $(var.BUILD_capinfos) ?>
   <Fragment>
     <DirectoryRef Id="INSTALLFOLDER">
       <Component Id="cmpCapinfos_exe" Guid="*">
@@ -354,8 +375,10 @@
       <ComponentRef Id="cmpCapinfos_html" />
     </ComponentGroup>
   </Fragment>
+  <?endif?>
 
   <!-- Captype -->
+  <?if $(var.BUILD_captype) ?>
   <Fragment>
     <DirectoryRef Id="INSTALLFOLDER">
       <Component Id="cmpCaptype_exe" Guid="*">
@@ -372,8 +395,10 @@
       <ComponentRef Id="cmpCaptype_html" />
     </ComponentGroup>
   </Fragment>
+  <?endif?>
 
   <!-- Rawshark -->
+  <?if $(var.BUILD_rawshark) ?>
   <Fragment>
     <DirectoryRef Id="INSTALLFOLDER">
       <Component Id="cmpRawshark_exe" Guid="*">
@@ -390,8 +415,10 @@
       <ComponentRef Id="cmpRawshark_html" />
     </ComponentGroup>
   </Fragment>
+  <?endif?>
 
   <!-- Randpkt -->
+  <?if $(var.BUILD_randpkt) ?>
   <Fragment>
     <DirectoryRef Id="INSTALLFOLDER">
       <Component Id="cmpRandpkt_exe" Guid="*">
@@ -408,8 +435,10 @@
       <ComponentRef Id="cmpRandpkt_html" />
     </ComponentGroup>
   </Fragment>
+  <?endif?>
 
   <!-- Sharkd -->
+  <?if $(var.BUILD_sharkd) ?>
   <Fragment>
     <DirectoryRef Id="INSTALLFOLDER">
       <Component Id="cmpSharkd_exe" Guid="*">
@@ -430,6 +459,7 @@
       -->
     </ComponentGroup>
   </Fragment>
+  <?endif?>
 
   <!-- MMDBResolve -->
   <?ifdef MMDBRESOLVE_EXE?>
@@ -452,6 +482,7 @@
   <?endif?>
 
   <!-- Androiddump -->
+  <?if $(var.BUILD_androiddump) ?>
   <Fragment>
     <DirectoryRef Id="dirExtcap">
       <Component Id="cmpAndroiddump_exe" Guid="*">
@@ -470,8 +501,10 @@
       <ComponentRef Id="cmpAndroiddump_html" />
     </ComponentGroup>
   </Fragment>
+  <?endif?>
 
   <!-- Randpktdump -->
+  <?if $(var.BUILD_randpktdump) ?>
   <Fragment>
     <DirectoryRef Id="dirExtcap">
       <Component Id="cmpRandpktdump_exe" Guid="*">
@@ -490,8 +523,10 @@
       <ComponentRef Id="cmpRandpktdump_html" />
     </ComponentGroup>
   </Fragment>
+  <?endif?>
 
   <!-- Etwdump -->
+  <?if $(var.BUILD_etwdump) ?>
   <Fragment>
     <DirectoryRef Id="dirExtcap">
       <Component Id="cmpEtwdump_exe" Guid="*">
@@ -510,8 +545,10 @@
       <ComponentRef Id="cmpEtwdump_html" />
     </ComponentGroup>
   </Fragment>
+  <?endif?>
 
   <!-- Sshdump -->
+  <?if $(var.BUILD_sshdump) ?>
   <Fragment>
     <DirectoryRef Id="dirExtcap">
       <Component Id="cmpSshdump_exe" Guid="*">
@@ -530,8 +567,10 @@
       <ComponentRef Id="cmpSshdump_html" />
     </ComponentGroup>
   </Fragment>
+  <?endif?>
 
   <!-- Ciscodump -->
+  <?if $(var.BUILD_ciscodump) ?>
   <Fragment>
     <DirectoryRef Id="dirExtcap">
       <Component Id="cmpCiscodump_exe" Guid="*">
@@ -550,8 +589,10 @@
       <ComponentRef Id="cmpCiscodump_html" />
     </ComponentGroup>
   </Fragment>
+  <?endif?>
 
   <!-- Wifidump -->
+  <?if $(var.BUILD_wifidump) ?>
   <Fragment>
     <DirectoryRef Id="dirExtcap">
       <Component Id="cmpWifidump_exe" Guid="*">
@@ -570,8 +611,10 @@
       <ComponentRef Id="cmpWifidump_html" />
     </ComponentGroup>
   </Fragment>
+  <?endif?>
 
   <!-- Udpdump -->
+  <?if $(var.BUILD_udpdump) ?>
   <Fragment>
     <DirectoryRef Id="dirExtcap">
       <Component Id="cmpUdpdump_exe" Guid="*">
@@ -590,6 +633,7 @@
       <ComponentRef Id="cmpUdpdump_html" />
     </ComponentGroup>
   </Fragment>
+  <?endif?>
 
   <!-- Shortcuts -->
   <Fragment>
