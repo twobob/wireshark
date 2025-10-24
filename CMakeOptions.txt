@@ -4,6 +4,12 @@ include(CMakeDependentOption)
 
 option(ENABLE_TINY_DEVICES "Reduce the build to console-only C components for resource-constrained targets" OFF)
 
+set(_enable_installer_default ON)
+if(ENABLE_TINY_DEVICES)
+        set(_enable_installer_default OFF)
+endif()
+option(ENABLE_INSTALLER "Generate platform-specific installers" ${_enable_installer_default})
+
 option(BUILD_wireshark     "Build Wireshark" ON)
 option(BUILD_stratoshark   "Build Stratoshark" OFF)
 if(BUILD_wireshark OR BUILD_stratoshark)

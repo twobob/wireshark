@@ -565,11 +565,15 @@ File "${STAGING_DIR}\pdml2html.xsl"
 File "${STAGING_DIR}\ws.css"
 File "${STAGING_DIR}\wireshark.html"
 File "${STAGING_DIR}\wireshark-filter.html"
+!ifdef BUILD_dumpcap
 File "${STAGING_DIR}\dumpcap.exe"
 File "${STAGING_DIR}\dumpcap.html"
+!endif
+!ifndef ENABLE_TINY_DEVICES
 File "${STAGING_DIR}\extcap.html"
 File "${STAGING_DIR}\ipmap.html"
 File "${STAGING_DIR}\Wireshark Release Notes.html"
+!endif
 
 !ifdef USE_VCREDIST
 ; C-runtime redistributable
@@ -1085,13 +1089,16 @@ SectionEnd ; "SecWiresharkQt"
 !endif
 
 
+!ifdef BUILD_tshark
 Section "TShark" SecTShark
 ;-------------------------------------------
 SetOutPath $INSTDIR
 File "${STAGING_DIR}\tshark.exe"
 File "${STAGING_DIR}\tshark.html"
 SectionEnd
+!endif
 
+!ifdef ENABLE_PLUGINS
 Section "-Plugins & Extensions"
 
 SetOutPath '$INSTDIR\plugins\${MAJOR_VERSION}.${MINOR_VERSION}\codecs'
@@ -1163,51 +1170,73 @@ SetOutPath '$INSTDIR\plugins\${MAJOR_VERSION}.${MINOR_VERSION}\epan'
 File "${STAGING_DIR}\plugins\${MAJOR_VERSION}.${MINOR_VERSION}\epan\stats_tree.dll"
 
 SectionEnd ; "Plugins / Extensions"
+!endif
 
 Section "-Additional command line tools"
 
 SetOutPath $INSTDIR
+!ifdef BUILD_capinfos
 File "${STAGING_DIR}\capinfos.exe"
 File "${STAGING_DIR}\capinfos.html"
+!endif
 
+!ifdef BUILD_captype
 File "${STAGING_DIR}\captype.exe"
 File "${STAGING_DIR}\captype.html"
+!endif
 
+!ifdef BUILD_editcap
 File "${STAGING_DIR}\editcap.exe"
 File "${STAGING_DIR}\editcap.html"
+!endif
 
+!ifdef BUILD_mergecap
 File "${STAGING_DIR}\mergecap.exe"
 File "${STAGING_DIR}\mergecap.html"
+!endif
 
 !ifdef MMDBRESOLVE_EXE
 File "${STAGING_DIR}\mmdbresolve.html"
 File "${STAGING_DIR}\mmdbresolve.exe"
 !endif
 
+!ifdef BUILD_randpkt
 File "${STAGING_DIR}\randpkt.exe"
 File "${STAGING_DIR}\randpkt.html"
+!endif
 
+!ifdef BUILD_rawshark
 File "${STAGING_DIR}\rawshark.exe"
 File "${STAGING_DIR}\rawshark.html"
+!endif
 
+!ifdef BUILD_reordercap
 File "${STAGING_DIR}\reordercap.exe"
 File "${STAGING_DIR}\reordercap.html"
+!endif
 
+!ifdef BUILD_sharkd
 File "${STAGING_DIR}\sharkd.exe"
 ;File "${STAGING_DIR}\sharkd.html"
+!endif
 
+!ifdef BUILD_text2pcap
 File "${STAGING_DIR}\text2pcap.exe"
 File "${STAGING_DIR}\text2pcap.html"
+!endif
 
 SectionEnd ; "Tools"
 
+!ifdef HAVE_EXTCAP_TOOLS
 SectionGroup /e "External capture tools (extcap)" SecExtcapGroup
 
+!ifdef BUILD_androiddump
 Section /o "Androiddump" SecAndroiddump
 ;-------------------------------------------
   !insertmacro InstallExtcap "androiddump"
 SectionEnd
 !insertmacro CheckExtrasFlag "androiddump"
+!endif
 
 !ifdef BUILD_etwdump
 Section "Etwdump" SecEtwdump
@@ -1217,35 +1246,52 @@ SectionEnd
 !insertmacro CheckExtrasFlag "Etwdump"
 !endif
 
+!ifdef BUILD_randpktdump
 Section /o "Randpktdump" SecRandpktdump
 ;-------------------------------------------
   !insertmacro InstallExtcap "randpktdump"
 SectionEnd
 !insertmacro CheckExtrasFlag "randpktdump"
+!endif
 
 !ifdef LIBSSH_FOUND
 Section /o "Sshdump, Ciscodump, and Wifidump" SecSshdump
 ;-------------------------------------------
+!ifdef BUILD_sshdump
   !insertmacro InstallExtcap "sshdump"
+!endif
+!ifdef BUILD_ciscodump
   !insertmacro InstallExtcap "ciscodump"
+!endif
+!ifdef BUILD_wifidump
   !insertmacro InstallExtcap "wifidump"
+!endif
 SectionEnd
+!ifdef BUILD_sshdump
 !insertmacro CheckExtrasFlag "sshdump"
+!endif
+!ifdef BUILD_ciscodump
 !insertmacro CheckExtrasFlag "ciscodump"
+!endif
+!ifdef BUILD_wifidump
 !insertmacro CheckExtrasFlag "wifidump"
 !endif
+!endif
 
+!ifdef BUILD_udpdump
 Section /o "UDPdump" SecUDPdump
 ;-------------------------------------------
   !insertmacro InstallExtcap "udpdump"
 SectionEnd
 !insertmacro CheckExtrasFlag "udpdump"
+!endif
 
 SectionGroupEnd ; "External Capture (extcap)"
 
 Section "-Clear Partial Selected"
 !insertmacro ClearSectionFlag ${SecExtcapGroup} ${SF_PSELECTED}
 SectionEnd
+!endif
 
 !ifdef DOC_DIR
 Section "-Documentation"
