@@ -2315,9 +2315,9 @@ if (BUILD_stratoshark)
 	)
 endif()
 
-if (ASCIIDOCTOR_FOUND)
-	list(APPEND DOC_FILES
-		${CMAKE_BINARY_DIR}/doc/man_pages/androiddump.html
+if (ASCIIDOCTOR_FOUND AND NOT ENABLE_TINY_DEVICES)
+        list(APPEND DOC_FILES
+                ${CMAKE_BINARY_DIR}/doc/man_pages/androiddump.html
 		${CMAKE_BINARY_DIR}/doc/man_pages/udpdump.html
 		${CMAKE_BINARY_DIR}/doc/man_pages/capinfos.html
 		${CMAKE_BINARY_DIR}/doc/man_pages/captype.html
