@@ -1831,13 +1831,17 @@ if(NOT LEMON_EXECUTABLE)
         add_subdirectory( tools/lemon )
 endif()
 add_subdirectory( epan )
+# The libui target provides common console-oriented helpers (failure messages,
+# capture option plumbing, profile management, etc.) that are required by the
+# command-line tools even in tiny-device builds.  Keep building it regardless of
+# ENABLE_TINY_DEVICES so targets like capinfos and tshark continue to link.
+add_subdirectory( ui )
 if(NOT ENABLE_TINY_DEVICES)
         add_subdirectory( extcap )
         add_subdirectory( randpkt_core )
         if(PCAP_FOUND)
                 add_subdirectory( tools/radiotap-gen )
         endif()
-        add_subdirectory( ui )
 endif()
 add_subdirectory( wiretap )
 add_subdirectory( writecap )
