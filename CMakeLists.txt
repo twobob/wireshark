@@ -1831,11 +1831,12 @@ if(NOT LEMON_EXECUTABLE)
         add_subdirectory( tools/lemon )
 endif()
 add_subdirectory( epan )
-# The libui target provides common console-oriented helpers (failure messages,
-# capture option plumbing, profile management, etc.) that are required by the
-# command-line tools even in tiny-device builds.  Keep building it regardless of
-# ENABLE_TINY_DEVICES so targets like capinfos and tshark continue to link.
+# Build UI support helpers. In tiny-device builds the subdirectory exposes a
+# lightweight console-only library instead of the full GUI helper archive.
 add_subdirectory( ui )
+if(NOT DEFINED WS_CONSOLE_UI_LIB)
+        set(WS_CONSOLE_UI_LIB ui)
+endif()
 if(NOT ENABLE_TINY_DEVICES)
         add_subdirectory( extcap )
         add_subdirectory( randpkt_core )
@@ -3268,13 +3269,13 @@ register_tap_files(tshark-tap-register.c
 )
 
 if(BUILD_tshark)
-	set(tshark_LIBS
-		ui
-		capchild
-		caputils
-		wiretap
-		epan
-		iface_monitor
+        set(tshark_LIBS
+                ${WS_CONSOLE_UI_LIB}
+                capchild
+                caputils
+                wiretap
+                epan
+                iface_monitor
 		wsutil
 		${APPLE_CORE_FOUNDATION_LIBRARY}
 		${APPLE_SYSTEM_CONFIGURATION_LIBRARY}
@@ -3298,13 +3299,13 @@ if(BUILD_tshark)
 endif()
 
 if(BUILD_strato)
-	set(strato_LIBS
-		capchild
-		ui
-		caputils
-		wiretap
-		epan
-		iface_monitor
+        set(strato_LIBS
+                capchild
+                ${WS_CONSOLE_UI_LIB}
+                caputils
+                wiretap
+                epan
+                iface_monitor
 		wsutil
 		${APPLE_CORE_FOUNDATION_LIBRARY}
 		${APPLE_SYSTEM_CONFIGURATION_LIBRARY}
@@ -3330,14 +3331,14 @@ if(BUILD_strato)
 endif()
 
 if(BUILD_tfshark)
-	set(tfshark_LIBS
-		m
-		ui
-		wiretap
-		epan
-		${APPLE_CORE_FOUNDATION_LIBRARY}
-		${APPLE_SYSTEM_CONFIGURATION_LIBRARY}
-	)
+        set(tfshark_LIBS
+                m
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                epan
+                ${APPLE_CORE_FOUNDATION_LIBRARY}
+                ${APPLE_SYSTEM_CONFIGURATION_LIBRARY}
+        )
 	set(tfshark_FILES
 		$<TARGET_OBJECTS:cli_main>
 		$<TARGET_OBJECTS:shark_common>
@@ -3352,13 +3353,13 @@ if(BUILD_tfshark)
 endif()
 
 if(BUILD_rawshark AND PCAP_FOUND)
-	set(rawshark_LIBS
-		caputils
-		ui
-		wiretap
-		epan
-		${APPLE_CORE_FOUNDATION_LIBRARY}
-		${APPLE_SYSTEM_CONFIGURATION_LIBRARY}
+        set(rawshark_LIBS
+                caputils
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                epan
+                ${APPLE_CORE_FOUNDATION_LIBRARY}
+                ${APPLE_SYSTEM_CONFIGURATION_LIBRARY}
 		${WIN_WS2_32_LIBRARY}
 	)
 	set(rawshark_FILES
@@ -3375,12 +3376,12 @@ if(BUILD_rawshark AND PCAP_FOUND)
 endif()
 
 if(BUILD_sharkd)
-	set(sharkd_LIBS
-		ui
-		wiretap
-		epan
-		${APPLE_CORE_FOUNDATION_LIBRARY}
-		${APPLE_SYSTEM_CONFIGURATION_LIBRARY}
+        set(sharkd_LIBS
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                epan
+                ${APPLE_CORE_FOUNDATION_LIBRARY}
+                ${APPLE_SYSTEM_CONFIGURATION_LIBRARY}
 		${WIN_WS2_32_LIBRARY}
 		${SPEEXDSP_LIBRARIES}
 		${GCRYPT_LIBRARIES}
@@ -3407,11 +3408,11 @@ if(BUILD_sharkd)
 endif()
 
 if(BUILD_dftest)
-	set(dftest_LIBS
-		ui
-		wiretap
-		epan
-	)
+        set(dftest_LIBS
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                epan
+        )
 	set(dftest_FILES
 		$<TARGET_OBJECTS:cli_main>
 		dftest.c
@@ -3430,12 +3431,12 @@ if(BUILD_dftest)
 endif()
 
 if(BUILD_randpkt)
-	set(randpkt_LIBS
-		randpkt_core
-		ui
-		wiretap
-		wsutil
-	)
+        set(randpkt_LIBS
+                randpkt_core
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                wsutil
+        )
 	set(randpkt_FILES
 		$<TARGET_OBJECTS:cli_main>
 		randpkt.c
@@ -3454,13 +3455,13 @@ if(BUILD_fuzzshark OR ENABLE_FUZZER OR OSS_FUZZ)
 endif()
 
 if(BUILD_text2pcap)
-	set(text2pcap_LIBS
-		wiretap
-		wsutil
-		ui
-		epan
-		${ZLIB_LIBRARIES}
-		${ZLIBNG_LIBRARIES}
+        set(text2pcap_LIBS
+                wiretap
+                wsutil
+                ${WS_CONSOLE_UI_LIB}
+                epan
+                ${ZLIB_LIBRARIES}
+                ${ZLIBNG_LIBRARIES}
 	)
 	set(text2pcap_FILES
 		$<TARGET_OBJECTS:cli_main>
@@ -3476,13 +3477,13 @@ if(BUILD_text2pcap)
 endif()
 
 if(BUILD_mergecap)
-	set(mergecap_LIBS
-		ui
-		wiretap
-		${ZLIB_LIBRARIES}
-		${ZLIBNG_LIBRARIES}
-		${CMAKE_DL_LIBS}
-	)
+        set(mergecap_LIBS
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                ${ZLIB_LIBRARIES}
+                ${ZLIBNG_LIBRARIES}
+                ${CMAKE_DL_LIBS}
+        )
 	set(mergecap_FILES
 		$<TARGET_OBJECTS:cli_main>
 		mergecap.c
@@ -3496,13 +3497,13 @@ if(BUILD_mergecap)
 endif()
 
 if(BUILD_reordercap)
-	set(reordercap_LIBS
-		ui
-		wiretap
-		${ZLIB_LIBRARIES}
-		${ZLIBNG_LIBRARIES}
-		${CMAKE_DL_LIBS}
-	)
+        set(reordercap_LIBS
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                ${ZLIB_LIBRARIES}
+                ${ZLIBNG_LIBRARIES}
+                ${CMAKE_DL_LIBS}
+        )
 	set(reordercap_FILES
 		$<TARGET_OBJECTS:cli_main>
 		reordercap.c
@@ -3516,12 +3517,12 @@ if(BUILD_reordercap)
 endif()
 
 if(BUILD_capinfos)
-	set(capinfos_LIBS
-		ui
-		wiretap
-		wsutil
-		${ZLIB_LIBRARIES}
-		${ZLIBNG_LIBRARIES}
+        set(capinfos_LIBS
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                wsutil
+                ${ZLIB_LIBRARIES}
+                ${ZLIBNG_LIBRARIES}
 		${GCRYPT_LIBRARIES}
 		${CMAKE_DL_LIBS}
 	)
@@ -3539,12 +3540,12 @@ if(BUILD_capinfos)
 endif()
 
 if(BUILD_captype)
-	set(captype_LIBS
-		ui
-		wiretap
-		wsutil
-		${ZLIB_LIBRARIES}
-		${ZLIBNG_LIBRARIES}
+        set(captype_LIBS
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                wsutil
+                ${ZLIB_LIBRARIES}
+                ${ZLIBNG_LIBRARIES}
 		${CMAKE_DL_LIBS}
 	)
 	set(captype_FILES
@@ -3560,12 +3561,12 @@ if(BUILD_captype)
 endif()
 
 if(BUILD_editcap)
-	set(editcap_LIBS
-		ui
-		wiretap
-		${ZLIB_LIBRARIES}
-		${ZLIBNG_LIBRARIES}
-		${GCRYPT_LIBRARIES}
+        set(editcap_LIBS
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                ${ZLIB_LIBRARIES}
+                ${ZLIBNG_LIBRARIES}
+                ${GCRYPT_LIBRARIES}
 		${CMAKE_DL_LIBS}
 	)
 	set(editcap_FILES
