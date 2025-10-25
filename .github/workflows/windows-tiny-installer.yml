@@ -59,6 +59,10 @@ jobs:
         with:
           name: windows-tiny-installer-artifacts
           path: |
+            build/Wireshark-*TinyInstaller*.exe
+            build/Wireshark-*TinyInstaller*.exe.sha256
+            build/Wireshark-*TinyInstaller*.msi
+            build/Wireshark-*TinyInstaller*.msi.sha256
             build/packaging/nsis/*.exe
             build/packaging/wix/*.msi
             build/packaging/portableapps/*.exe
