@@ -65,53 +65,85 @@ file(GLOB EXTRA_UI_HEADERS
 set(UI_SRC ${NONGENERATED_UI_SRC})
 
 add_lex_files(LEX_FILES UI_SRC
-	text_import_scanner.l
+        text_import_scanner.l
 )
 
 set_source_files_properties(
-	${NONGENERATED_UI_SRC}
-	PROPERTIES
-	COMPILE_FLAGS "${WERROR_COMMON_FLAGS}"
+        ${NONGENERATED_UI_SRC}
+        PROPERTIES
+        COMPILE_FLAGS "${WERROR_COMMON_FLAGS}"
 )
 
-add_library(ui STATIC ${UI_SRC})
+if(ENABLE_TINY_DEVICES)
+        set(_console_ui_target ui_console)
+        add_library(${_console_ui_target} STATIC ${UI_SRC})
 
-target_link_libraries(ui
-	PRIVATE
-		wsutil
-		wiretap
-		${M_LIBRARIES}
-)
+        target_link_libraries(${_console_ui_target}
+                PRIVATE
+                        wsutil
+                        wiretap
+                        ${M_LIBRARIES}
+        )
 
-target_include_directories(ui
-	SYSTEM PRIVATE
-		${PCAP_INCLUDE_DIRS}
-		${WINSPARKLE_INCLUDE_DIRS}
-)
+        target_include_directories(${_console_ui_target}
+                SYSTEM PRIVATE
+                        ${PCAP_INCLUDE_DIRS}
+                        ${WINSPARKLE_INCLUDE_DIRS}
+        )
 
-add_library(summary STATIC summary.c)
+        set_target_properties(${_console_ui_target} PROPERTIES
+                LINK_FLAGS "${WS_LINK_FLAGS}"
+                FOLDER "UI"
+        )
+        if(MSVC)
+                set_target_properties(${_console_ui_target} PROPERTIES
+                        LINK_FLAGS_DEBUG "${WS_MSVC_DEBUG_LINK_FLAGS}"
+                )
+        endif()
 
-target_link_libraries(summary
-	PRIVATE
-		wiretap
-		epan
-		wsutil
-		${GCRYPT_LIBRARIES}
-	)
+        set(WS_CONSOLE_UI_LIB ${_console_ui_target} PARENT_SCOPE)
+else()
+        add_library(ui STATIC ${UI_SRC})
 
-target_include_directories(summary
-	SYSTEM PRIVATE
-		${GCRYPT_INCLUDE_DIRS}
-)
+        target_link_libraries(ui
+                PRIVATE
+                        wsutil
+                        wiretap
+                        ${M_LIBRARIES}
+        )
 
-set_target_properties(ui summary PROPERTIES
-	LINK_FLAGS "${WS_LINK_FLAGS}"
-	FOLDER "UI"
-)
-if(MSVC)
-	set_target_properties(ui summary PROPERTIES
-		LINK_FLAGS_DEBUG "${WS_MSVC_DEBUG_LINK_FLAGS}"
-	)
+        target_include_directories(ui
+                SYSTEM PRIVATE
+                        ${PCAP_INCLUDE_DIRS}
+                        ${WINSPARKLE_INCLUDE_DIRS}
+        )
+
+        add_library(summary STATIC summary.c)
+
+        target_link_libraries(summary
+                PRIVATE
+                        wiretap
+                        epan
+                        wsutil
+                        ${GCRYPT_LIBRARIES}
+                )
+
+        target_include_directories(summary
+                SYSTEM PRIVATE
+                        ${GCRYPT_INCLUDE_DIRS}
+        )
+
+        set_target_properties(ui summary PROPERTIES
+                LINK_FLAGS "${WS_LINK_FLAGS}"
+                FOLDER "UI"
+        )
+        if(MSVC)
+                set_target_properties(ui summary PROPERTIES
+                        LINK_FLAGS_DEBUG "${WS_MSVC_DEBUG_LINK_FLAGS}"
+                )
+        endif()
+
+        set(WS_CONSOLE_UI_LIB ui PARENT_SCOPE)
 endif()
 
 CHECKAPI(

@@ -1827,17 +1827,22 @@ set(PLUGIN_INSTALL_VERSION_LIBDIR "${PLUGIN_INSTALL_LIBDIR}/${PLUGIN_PATH_ID}")
 set(PLUGIN_VERSION_DIR "plugins/${PLUGIN_PATH_ID}")
 
 add_subdirectory( capture )
+if(NOT LEMON_EXECUTABLE)
+        add_subdirectory( tools/lemon )
+endif()
 add_subdirectory( epan )
+# Build UI support helpers. In tiny-device builds the subdirectory exposes a
+# lightweight console-only library instead of the full GUI helper archive.
+add_subdirectory( ui )
+if(NOT DEFINED WS_CONSOLE_UI_LIB)
+        set(WS_CONSOLE_UI_LIB ui)
+endif()
 if(NOT ENABLE_TINY_DEVICES)
         add_subdirectory( extcap )
         add_subdirectory( randpkt_core )
-        if(NOT LEMON_EXECUTABLE)
-                add_subdirectory( tools/lemon )
-        endif()
         if(PCAP_FOUND)
                 add_subdirectory( tools/radiotap-gen )
         endif()
-        add_subdirectory( ui )
 endif()
 add_subdirectory( wiretap )
 add_subdirectory( writecap )
@@ -2315,9 +2320,9 @@ if (BUILD_stratoshark)
 	)
 endif()
 
-if (ASCIIDOCTOR_FOUND)
-	list(APPEND DOC_FILES
-		${CMAKE_BINARY_DIR}/doc/man_pages/androiddump.html
+if (ASCIIDOCTOR_FOUND AND NOT ENABLE_TINY_DEVICES)
+        list(APPEND DOC_FILES
+                ${CMAKE_BINARY_DIR}/doc/man_pages/androiddump.html
 		${CMAKE_BINARY_DIR}/doc/man_pages/udpdump.html
 		${CMAKE_BINARY_DIR}/doc/man_pages/capinfos.html
 		${CMAKE_BINARY_DIR}/doc/man_pages/captype.html
@@ -3264,13 +3269,13 @@ register_tap_files(tshark-tap-register.c
 )
 
 if(BUILD_tshark)
-	set(tshark_LIBS
-		ui
-		capchild
-		caputils
-		wiretap
-		epan
-		iface_monitor
+        set(tshark_LIBS
+                ${WS_CONSOLE_UI_LIB}
+                capchild
+                caputils
+                wiretap
+                epan
+                iface_monitor
 		wsutil
 		${APPLE_CORE_FOUNDATION_LIBRARY}
 		${APPLE_SYSTEM_CONFIGURATION_LIBRARY}
@@ -3294,13 +3299,13 @@ if(BUILD_tshark)
 endif()
 
 if(BUILD_strato)
-	set(strato_LIBS
-		capchild
-		ui
-		caputils
-		wiretap
-		epan
-		iface_monitor
+        set(strato_LIBS
+                capchild
+                ${WS_CONSOLE_UI_LIB}
+                caputils
+                wiretap
+                epan
+                iface_monitor
 		wsutil
 		${APPLE_CORE_FOUNDATION_LIBRARY}
 		${APPLE_SYSTEM_CONFIGURATION_LIBRARY}
@@ -3326,14 +3331,14 @@ if(BUILD_strato)
 endif()
 
 if(BUILD_tfshark)
-	set(tfshark_LIBS
-		m
-		ui
-		wiretap
-		epan
-		${APPLE_CORE_FOUNDATION_LIBRARY}
-		${APPLE_SYSTEM_CONFIGURATION_LIBRARY}
-	)
+        set(tfshark_LIBS
+                m
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                epan
+                ${APPLE_CORE_FOUNDATION_LIBRARY}
+                ${APPLE_SYSTEM_CONFIGURATION_LIBRARY}
+        )
 	set(tfshark_FILES
 		$<TARGET_OBJECTS:cli_main>
 		$<TARGET_OBJECTS:shark_common>
@@ -3348,13 +3353,13 @@ if(BUILD_tfshark)
 endif()
 
 if(BUILD_rawshark AND PCAP_FOUND)
-	set(rawshark_LIBS
-		caputils
-		ui
-		wiretap
-		epan
-		${APPLE_CORE_FOUNDATION_LIBRARY}
-		${APPLE_SYSTEM_CONFIGURATION_LIBRARY}
+        set(rawshark_LIBS
+                caputils
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                epan
+                ${APPLE_CORE_FOUNDATION_LIBRARY}
+                ${APPLE_SYSTEM_CONFIGURATION_LIBRARY}
 		${WIN_WS2_32_LIBRARY}
 	)
 	set(rawshark_FILES
@@ -3371,12 +3376,12 @@ if(BUILD_rawshark AND PCAP_FOUND)
 endif()
 
 if(BUILD_sharkd)
-	set(sharkd_LIBS
-		ui
-		wiretap
-		epan
-		${APPLE_CORE_FOUNDATION_LIBRARY}
-		${APPLE_SYSTEM_CONFIGURATION_LIBRARY}
+        set(sharkd_LIBS
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                epan
+                ${APPLE_CORE_FOUNDATION_LIBRARY}
+                ${APPLE_SYSTEM_CONFIGURATION_LIBRARY}
 		${WIN_WS2_32_LIBRARY}
 		${SPEEXDSP_LIBRARIES}
 		${GCRYPT_LIBRARIES}
@@ -3403,11 +3408,11 @@ if(BUILD_sharkd)
 endif()
 
 if(BUILD_dftest)
-	set(dftest_LIBS
-		ui
-		wiretap
-		epan
-	)
+        set(dftest_LIBS
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                epan
+        )
 	set(dftest_FILES
 		$<TARGET_OBJECTS:cli_main>
 		dftest.c
@@ -3426,12 +3431,12 @@ if(BUILD_dftest)
 endif()
 
 if(BUILD_randpkt)
-	set(randpkt_LIBS
-		randpkt_core
-		ui
-		wiretap
-		wsutil
-	)
+        set(randpkt_LIBS
+                randpkt_core
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                wsutil
+        )
 	set(randpkt_FILES
 		$<TARGET_OBJECTS:cli_main>
 		randpkt.c
@@ -3450,13 +3455,13 @@ if(BUILD_fuzzshark OR ENABLE_FUZZER OR OSS_FUZZ)
 endif()
 
 if(BUILD_text2pcap)
-	set(text2pcap_LIBS
-		wiretap
-		wsutil
-		ui
-		epan
-		${ZLIB_LIBRARIES}
-		${ZLIBNG_LIBRARIES}
+        set(text2pcap_LIBS
+                wiretap
+                wsutil
+                ${WS_CONSOLE_UI_LIB}
+                epan
+                ${ZLIB_LIBRARIES}
+                ${ZLIBNG_LIBRARIES}
 	)
 	set(text2pcap_FILES
 		$<TARGET_OBJECTS:cli_main>
@@ -3472,13 +3477,13 @@ if(BUILD_text2pcap)
 endif()
 
 if(BUILD_mergecap)
-	set(mergecap_LIBS
-		ui
-		wiretap
-		${ZLIB_LIBRARIES}
-		${ZLIBNG_LIBRARIES}
-		${CMAKE_DL_LIBS}
-	)
+        set(mergecap_LIBS
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                ${ZLIB_LIBRARIES}
+                ${ZLIBNG_LIBRARIES}
+                ${CMAKE_DL_LIBS}
+        )
 	set(mergecap_FILES
 		$<TARGET_OBJECTS:cli_main>
 		mergecap.c
@@ -3492,13 +3497,13 @@ if(BUILD_mergecap)
 endif()
 
 if(BUILD_reordercap)
-	set(reordercap_LIBS
-		ui
-		wiretap
-		${ZLIB_LIBRARIES}
-		${ZLIBNG_LIBRARIES}
-		${CMAKE_DL_LIBS}
-	)
+        set(reordercap_LIBS
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                ${ZLIB_LIBRARIES}
+                ${ZLIBNG_LIBRARIES}
+                ${CMAKE_DL_LIBS}
+        )
 	set(reordercap_FILES
 		$<TARGET_OBJECTS:cli_main>
 		reordercap.c
@@ -3512,12 +3517,12 @@ if(BUILD_reordercap)
 endif()
 
 if(BUILD_capinfos)
-	set(capinfos_LIBS
-		ui
-		wiretap
-		wsutil
-		${ZLIB_LIBRARIES}
-		${ZLIBNG_LIBRARIES}
+        set(capinfos_LIBS
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                wsutil
+                ${ZLIB_LIBRARIES}
+                ${ZLIBNG_LIBRARIES}
 		${GCRYPT_LIBRARIES}
 		${CMAKE_DL_LIBS}
 	)
@@ -3535,12 +3540,12 @@ if(BUILD_capinfos)
 endif()
 
 if(BUILD_captype)
-	set(captype_LIBS
-		ui
-		wiretap
-		wsutil
-		${ZLIB_LIBRARIES}
-		${ZLIBNG_LIBRARIES}
+        set(captype_LIBS
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                wsutil
+                ${ZLIB_LIBRARIES}
+                ${ZLIBNG_LIBRARIES}
 		${CMAKE_DL_LIBS}
 	)
 	set(captype_FILES
@@ -3556,12 +3561,12 @@ if(BUILD_captype)
 endif()
 
 if(BUILD_editcap)
-	set(editcap_LIBS
-		ui
-		wiretap
-		${ZLIB_LIBRARIES}
-		${ZLIBNG_LIBRARIES}
-		${GCRYPT_LIBRARIES}
+        set(editcap_LIBS
+                ${WS_CONSOLE_UI_LIB}
+                wiretap
+                ${ZLIB_LIBRARIES}
+                ${ZLIBNG_LIBRARIES}
+                ${GCRYPT_LIBRARIES}
 		${CMAKE_DL_LIBS}
 	)
 	set(editcap_FILES
@@ -3687,29 +3692,38 @@ if(BUILD_dcerpcidl2wrs)
 	)
 endif()
 
+set(HAVE_EXTCAP_TOOLS OFF)
+foreach(_extcap androiddump ciscodump etwdump randpktdump sshdump wifidump udpdump)
+        if(BUILD_${_extcap})
+                set(HAVE_EXTCAP_TOOLS ON)
+        endif()
+endforeach()
+
 if(WIN32)
-	find_package( MSVC_REDIST )
+        find_package( MSVC_REDIST )
 
-	# Must come after executable targets are defined.
-	find_package( NSIS )
+        # Must come after executable targets are defined.
+        if(ENABLE_INSTALLER)
+                find_package( NSIS )
 
-	if(MAKENSIS_EXECUTABLE)
-		add_subdirectory( packaging/nsis EXCLUDE_FROM_ALL )
-		ADD_NSIS_PACKAGE_TARGETS()
-	endif()
+                if(MAKENSIS_EXECUTABLE)
+                        add_subdirectory( packaging/nsis EXCLUDE_FROM_ALL )
+                        ADD_NSIS_PACKAGE_TARGETS()
+                endif()
 
-	find_package( WiX )
+                find_package( WiX )
 
-	if(WIX_CANDLE_EXECUTABLE)
-		add_subdirectory( packaging/wix EXCLUDE_FROM_ALL )
-		ADD_WIX_PACKAGE_TARGET()
-	endif()
+                if(WIX_CANDLE_EXECUTABLE)
+                        add_subdirectory( packaging/wix EXCLUDE_FROM_ALL )
+                        ADD_WIX_PACKAGE_TARGET()
+                endif()
 
-	find_package( PortableApps )
-	if(PORTABLEAPPS_LAUNCHER_GENERATOR_EXECUTABLE AND PORTABLEAPPS_INSTALLER_EXECUTABLE)
-		add_subdirectory( packaging/portableapps EXCLUDE_FROM_ALL )
-		ADD_PORTABLEAPPS_PACKAGE_TARGET()
-	endif()
+                find_package( PortableApps )
+                if(PORTABLEAPPS_LAUNCHER_GENERATOR_EXECUTABLE AND PORTABLEAPPS_INSTALLER_EXECUTABLE)
+                        add_subdirectory( packaging/portableapps EXCLUDE_FROM_ALL )
+                        ADD_PORTABLEAPPS_PACKAGE_TARGET()
+                endif()
+        endif()
 endif()
 
 if (MAXMINDDB_FOUND)
@@ -4298,19 +4312,19 @@ install(
 		${CMAKE_INSTALL_DOCDIR}
 )
 
-if(ASCIIDOCTOR_FOUND AND XSLTPROC_EXECUTABLE)
-	install(
-		DIRECTORY "${CMAKE_BINARY_DIR}/doc/wsug_html_chunked"
-		DESTINATION "${CMAKE_INSTALL_DOCDIR}"
-		COMPONENT "UserGuide"
-		EXCLUDE_FROM_ALL
-	)
-	install(
-		DIRECTORY "${CMAKE_BINARY_DIR}/doc/wsdg_html_chunked"
-		DESTINATION "${CMAKE_INSTALL_DOCDIR}"
-		COMPONENT "DeveloperGuide"
-		EXCLUDE_FROM_ALL
-	)
+if(ASCIIDOCTOR_FOUND AND XSLTPROC_EXECUTABLE AND NOT ENABLE_TINY_DEVICES)
+        install(
+                DIRECTORY "${CMAKE_BINARY_DIR}/doc/wsug_html_chunked"
+                DESTINATION "${CMAKE_INSTALL_DOCDIR}"
+                COMPONENT "UserGuide"
+                EXCLUDE_FROM_ALL
+        )
+        install(
+                DIRECTORY "${CMAKE_BINARY_DIR}/doc/wsdg_html_chunked"
+                DESTINATION "${CMAKE_INSTALL_DOCDIR}"
+                COMPONENT "DeveloperGuide"
+                EXCLUDE_FROM_ALL
+        )
 endif()
 
 set(SHARK_PUBLIC_HEADERS

@@ -57,6 +57,14 @@ offline workflows. See [`doc/tiny-device-pcap.md`](doc/tiny-device-pcap.md) for
 an end-to-end example that includes an ESP32-friendly `pcap` writer helper and
 host-side piping commands.
 
+Installer generation is disabled by default in tiny builds so the build tree is
+ready for cross-compiling without the GUI assets. To produce console-only
+installers, enable the `ENABLE_INSTALLER` option explicitly:
+
+```
+cmake -DENABLE_TINY_DEVICES=ON -DENABLE_INSTALLER=ON -DCMAKE_BUILD_TYPE=Release /path/to/wireshark
+```
+
 It should run on other Unix-ish systems without too much trouble.
 
 Python 3 is needed to build Wireshark. AsciiDoctor is required to build

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Include>
 
+  <?if $(var.ENABLE_PLUGINS) ?>
   <!-- Plugins -->
     <Fragment>
         <DirectoryRef Id="dirPluginsVersionEpan">
@@ -155,4 +156,5 @@
         </ComponentGroup>
     </Fragment>
 
+  <?endif?>
 </Include>

@@ -1,4 +1,4 @@
-name: Build Windows Tiny Devices
+name: Build Windows Tiny Devices Installer
 
 on:
   push:
@@ -11,14 +11,14 @@ on:
       - master
 
 jobs:
-  windows-tiny:
-    name: Build Tiny Devices
+  windows-tiny-installer:
+    name: Build Tiny Devices Installer
     runs-on: windows-2022
     env:
       PLATFORM: x64
       WIRESHARK_BASE_DIR: C:\\Development
       CMAKE_PREFIX_PATH: D:\\a\\wireshark\\Qt\\6.8.3\\msvc2022_64
-      WIRESHARK_VERSION_EXTRA: -GithubActionTinyBuild
+      WIRESHARK_VERSION_EXTRA: -GithubActionTinyInstaller
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,8 +39,8 @@ jobs:
       - name: Create build directory
         run: mkdir build
 
-      - name: Configure tiny device build
-        run: cmake -DENABLE_TINY_DEVICES=ON -DENABLE_INSTALLER=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_SYSTEM_VERSION="10.0.20348.0" -A x64 ..
+      - name: Configure tiny installer build
+        run: cmake -DENABLE_TINY_DEVICES=ON -DENABLE_INSTALLER=ON -DCMAKE_BUILD_TYPE=Release -DCMAKE_SYSTEM_VERSION="10.0.20348.0" -A x64 ..
         env:
           PLATFORM: x64
           WIRESHARK_BASE_DIR: C:/wireshark-libs
@@ -49,3 +49,21 @@ jobs:
       - name: Build tiny device binaries
         run: cmake --build . --config Release
         working-directory: build
+
+      - name: Create installer packages
+        run: cmake --build . --config Release --target package
+        working-directory: build
+
+      - name: Upload installer artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-tiny-installer-artifacts
+          path: |
+            build/Wireshark-*TinyInstaller*.exe
+            build/Wireshark-*TinyInstaller*.exe.sha256
+            build/Wireshark-*TinyInstaller*.msi
+            build/Wireshark-*TinyInstaller*.msi.sha256
+            build/packaging/nsis/*.exe
+            build/packaging/wix/*.msi
+            build/packaging/portableapps/*.exe
+          if-no-files-found: ignore

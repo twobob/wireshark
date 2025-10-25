@@ -181,32 +181,67 @@ if (MAXMINDDB_FOUND)
 	set(d_mmdbresolve_exe "-dMMDBRESOLVE_EXE")
 endif()
 
-set(WIX_CANDLE_DEFINES
-	-v
-	-sw1076
-	-dPlatform=${WIRESHARK_TARGET_PLATFORM}
-	-dWiresharkName=${CMAKE_PROJECT_NAME}
-	-dWiresharkVersion=${PRODUCT_VERSION}
-	-dWiresharkMajorVersion=${PROJECT_MAJOR_VERSION}
-	-dWiresharkMinorVersion=${PROJECT_MINOR_VERSION}
-	-dAssetDir=${CMAKE_SOURCE_DIR}/packaging/wix
-	-dBuildOutputDir=${EXECUTABLE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}
-	-dDiameterDir=${ARCHIVE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}/diameter
-	-dIconDir=${CMAKE_SOURCE_DIR}/resources/icons
-	-dQtTranslationDir=${ARCHIVE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}/translations
-	-dRadiusDictDir=${ARCHIVE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}/radius
-	-dSnmpMibDir=${ARCHIVE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}/snmp/mibs
-	-dUsersGuideDir=${ARCHIVE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}/doc/wsug_html_chunked
-	-dVCRedistVersion=${MSVC_CRT_VERSION}
-	-dVCRedistDir=${MERGE_MODULE_DIR}
-	${d_smi_dir}
-	${d_mmdbresolve_exe}
-	-arch ${WIRESHARK_TARGET_PLATFORM}
-	-ext WixUIExtension
-	-I${CMAKE_SOURCE_DIR}/packaging/wix
-	-out ${CMAKE_CURRENT_BINARY_DIR}/
-	PARENT_SCOPE
+set(_wix_candle_defines
+        -v
+        -sw1076
+        -dPlatform=${WIRESHARK_TARGET_PLATFORM}
+        -dWiresharkName=${CMAKE_PROJECT_NAME}
+        -dWiresharkVersion=${PRODUCT_VERSION}
+        -dWiresharkMajorVersion=${PROJECT_MAJOR_VERSION}
+        -dWiresharkMinorVersion=${PROJECT_MINOR_VERSION}
+        -dAssetDir=${CMAKE_SOURCE_DIR}/packaging/wix
+        -dBuildOutputDir=${EXECUTABLE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}
+        -dDiameterDir=${ARCHIVE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}/diameter
+        -dIconDir=${CMAKE_SOURCE_DIR}/resources/icons
+        -dQtTranslationDir=${ARCHIVE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}/translations
+        -dRadiusDictDir=${ARCHIVE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}/radius
+        -dSnmpMibDir=${ARCHIVE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}/snmp/mibs
+        -dUsersGuideDir=${ARCHIVE_OUTPUT_PATH}/${CMAKE_CFG_INTDIR}/doc/wsug_html_chunked
+        -dVCRedistVersion=${MSVC_CRT_VERSION}
+        -dVCRedistDir=${MERGE_MODULE_DIR}
+        ${d_smi_dir}
+        ${d_mmdbresolve_exe}
+        -arch ${WIRESHARK_TARGET_PLATFORM}
+        -ext WixUIExtension
+        -I${CMAKE_SOURCE_DIR}/packaging/wix
+        -out ${CMAKE_CURRENT_BINARY_DIR}/
 )
+
+foreach(_tool wireshark tshark dumpcap capinfos captype editcap mergecap randpkt rawshark reordercap sharkd text2pcap)
+        if(BUILD_${_tool})
+                list(APPEND _wix_candle_defines -dBUILD_${_tool}=1)
+        else()
+                list(APPEND _wix_candle_defines -dBUILD_${_tool}=0)
+        endif()
+endforeach()
+
+foreach(_extcap androiddump ciscodump etwdump randpktdump sshdump wifidump udpdump)
+        if(BUILD_${_extcap})
+                list(APPEND _wix_candle_defines -dBUILD_${_extcap}=1)
+        else()
+                list(APPEND _wix_candle_defines -dBUILD_${_extcap}=0)
+        endif()
+endforeach()
+
+if(ENABLE_PLUGINS)
+        list(APPEND _wix_candle_defines -dENABLE_PLUGINS=1)
+else()
+        list(APPEND _wix_candle_defines -dENABLE_PLUGINS=0)
+endif()
+
+if(HAVE_EXTCAP_TOOLS)
+        list(APPEND _wix_candle_defines -dHAVE_EXTCAP_TOOLS=1)
+else()
+        list(APPEND _wix_candle_defines -dHAVE_EXTCAP_TOOLS=0)
+endif()
+
+if(ENABLE_TINY_DEVICES)
+        list(APPEND _wix_candle_defines -dENABLE_TINY_DEVICES=1)
+else()
+        list(APPEND _wix_candle_defines -dENABLE_TINY_DEVICES=0)
+endif()
+
+set(WIX_CANDLE_DEFINES ${_wix_candle_defines} PARENT_SCOPE)
 
 # The NSIS CMakeFile sets the program name + version slightly differently.
 set(WIX_LIGHT_DEFINES
