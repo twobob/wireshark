@@ -4312,19 +4312,19 @@ install(
 		${CMAKE_INSTALL_DOCDIR}
 )
 
-if(ASCIIDOCTOR_FOUND AND XSLTPROC_EXECUTABLE)
-	install(
-		DIRECTORY "${CMAKE_BINARY_DIR}/doc/wsug_html_chunked"
-		DESTINATION "${CMAKE_INSTALL_DOCDIR}"
-		COMPONENT "UserGuide"
-		EXCLUDE_FROM_ALL
-	)
-	install(
-		DIRECTORY "${CMAKE_BINARY_DIR}/doc/wsdg_html_chunked"
-		DESTINATION "${CMAKE_INSTALL_DOCDIR}"
-		COMPONENT "DeveloperGuide"
-		EXCLUDE_FROM_ALL
-	)
+if(ASCIIDOCTOR_FOUND AND XSLTPROC_EXECUTABLE AND NOT ENABLE_TINY_DEVICES)
+        install(
+                DIRECTORY "${CMAKE_BINARY_DIR}/doc/wsug_html_chunked"
+                DESTINATION "${CMAKE_INSTALL_DOCDIR}"
+                COMPONENT "UserGuide"
+                EXCLUDE_FROM_ALL
+        )
+        install(
+                DIRECTORY "${CMAKE_BINARY_DIR}/doc/wsdg_html_chunked"
+                DESTINATION "${CMAKE_INSTALL_DOCDIR}"
+                COMPONENT "DeveloperGuide"
+                EXCLUDE_FROM_ALL
+        )
 endif()
 
 set(SHARK_PUBLIC_HEADERS
